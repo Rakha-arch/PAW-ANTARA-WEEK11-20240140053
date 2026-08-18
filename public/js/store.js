@@ -1,24 +1,19 @@
-/**
- * State management sederhana tanpa framework.
- * Satu "state" jadi sumber kebenaran, tiap kali berubah,
- * semua yang subscribe dikasih tau buat render ulang.
- */
-function createStore(initialState) {
-  let state = initialState;
-  const listeners = [];
-
-  function getState() {
-    return state;
-  }
-
-  function setState(partialState) {
-    state = { ...state, ...partialState };
-    listeners.forEach((listener) => listener(state));
-  }
-
-  function subscribe(listener) {
-    listeners.push(listener);
-  }
-
-  return { getState, setState, subscribe };
-}
+const Store = {
+    state: {
+        products: [
+            { id: 1, name: "Arabica Gayo", origin: "Aceh, Sumatra", price: 85000, stock: "Tersedia", notes: "Fruity, Floral, Medium Bodied" },
+            { id: 2, name: "Robusta Dampit", origin: "Malang, Java", price: 55000, stock: "Tersedia", notes: "Nutty, Chocolate, Bold" },
+            { id: 3, name: "Liberica Meranti", origin: "Riau, Sumatra", price: 95000, stock: "Habis", notes: "Jackfruit, Woody, Low Acidity" },
+            { id: 4, name: "Arabica Kintamani", origin: "Bali", price: 90000, stock: "Tersedia", notes: "Citrus, Caramel, Clean Aftertaste" }
+        ],
+        cartCount: 0
+    },
+    listeners: [],
+    getState() { return this.state; },
+    setState(newState) {
+        this.state = { ...this.state, ...newState };
+        this.notify();
+    },
+    subscribe(listener) { this.listeners.push(listener); },
+    notify() { this.listeners.forEach(listener => listener(this.state)); }
+};
