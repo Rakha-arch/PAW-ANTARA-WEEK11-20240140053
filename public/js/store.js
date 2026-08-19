@@ -6,7 +6,9 @@ const Store = {
             { id: 3, name: "Liberica Meranti", origin: "Riau, Sumatra", price: 95000, stock: "Habis", notes: "Jackfruit, Woody, Low Acidity" },
             { id: 4, name: "Arabica Kintamani", origin: "Bali", price: 90000, stock: "Tersedia", notes: "Citrus, Caramel, Clean Aftertaste" }
         ],
-        cartCount: 0
+        cartCount: 0,
+        cart: [],
+        isCartOpen: false
     },
     listeners: [],
     getState() { return this.state; },

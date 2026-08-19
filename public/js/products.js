@@ -32,11 +32,92 @@ function renderProducts(state) {
 
 function addToCart(id) {
     const current = Store.getState();
-    Store.setState({ cartCount: current.cartCount + 1 });
-    document.getElementById('cart-counter').innerText = Store.getState().cartCount;
+    const product = current.products.find(p => p.id === id);
+    if (!product) return;
+
+    const cart = [...current.cart];
+    const existing = cart.find(item => item.id === id);
+    if (existing) {
+        existing.qty += 1;
+    } else {
+        cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
+    }
+
+    const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
+    Store.setState({ cart, cartCount });
+}
+
+function removeFromCart(id) {
+    const current = Store.getState();
+    const cart = current.cart.filter(item => item.id !== id);
+    const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
+    Store.setState({ cart, cartCount });
+}
+
+function toggleCart() {
+    const current = Store.getState();
+    Store.setState({ isCartOpen: !current.isCartOpen });
+}
+
+function checkout() {
+    const current = Store.getState();
+    if (current.cart.length === 0) return;
+
+    Store.setState({ cart: [], cartCount: 0, isCartOpen: false });
+    showCheckoutNotice();
+}
+
+function showCheckoutNotice() {
+    const existing = document.getElementById('checkout-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.id = 'checkout-toast';
+    toast.className = 'checkout-toast';
+    toast.innerText = 'Pesanan Anda sudah di-checkout';
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => toast.classList.add('show'));
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+
+function renderCart(state) {
+    const counter = document.getElementById('cart-counter');
+    if (counter) counter.innerText = state.cartCount;
+
+    const panel = document.getElementById('cart-panel');
+    if (!panel) return;
+    panel.classList.toggle('open', state.isCartOpen);
+
+    const body = document.getElementById('cart-body');
+    if (!body) return;
+
+    if (state.cart.length === 0) {
+        body.innerHTML = '<p class="cart-empty">Keranjang masih kosong.</p>';
+        return;
+    }
+
+    const total = state.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+    body.innerHTML = state.cart.map(item => `
+        <div class="cart-item">
+            <div>
+                <p class="cart-item-name">${item.name}</p>
+                <p class="cart-item-sub">${item.qty} x Rp ${item.price.toLocaleString('id-ID')}</p>
+            </div>
+            <button class="btn-remove" onclick="removeFromCart(${item.id})">&times;</button>
+        </div>
+    `).join('')
+        + `<div class="cart-total">Total: Rp ${total.toLocaleString('id-ID')}</div>`
+        + `<button class="btn-checkout" onclick="checkout()">Checkout</button>`;
 }
 
 Store.subscribe(renderProducts);
+Store.subscribe(renderCart);
 document.addEventListener('DOMContentLoaded', () => {
     renderProducts(Store.getState());
+    renderCart(Store.getState());
 });

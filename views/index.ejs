@@ -9,9 +9,19 @@
 <body>
     <nav class="navbar">
         <div class="nav-brand">Kopi<span>Nusantara</span></div>
-        <div class="cart-wrapper">
+        <div class="cart-wrapper" onclick="toggleCart()">
             <span>Keranjang</span>
             <span id="cart-counter" class="cart-badge">0</span>
+
+            <div id="cart-panel" class="cart-panel" onclick="event.stopPropagation()">
+                <div class="cart-panel-header">
+                    <h4>Keranjang Belanja</h4>
+                    <button class="btn-close-cart" onclick="toggleCart()">&times;</button>
+                </div>
+                <div id="cart-body" class="cart-body">
+                    <p class="cart-empty">Keranjang masih kosong.</p>
+                </div>
+            </div>
         </div>
     </nav>
 
